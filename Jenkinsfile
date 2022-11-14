@@ -61,6 +61,31 @@ pipeline {
 			}
 
 		}
+		stage('Pacakage'){
+			steps{
+				sh "mvn pacakge -DskipTests"
+			}
+
+		}		
+		stage('Build Docker Image'){
+			steps {
+				// docker build -t shyam19909/currency-exchange-devops:$env.BUILD_TAG
+				script{
+					dockerImage = docker.build("shyam19909/currency-exchange-devops:$env.BUILD_TAG")
+				}
+			}
+		}
+		stage{
+			steps{
+				script{
+					docker.withRegistry('','doeckerhub'){
+						dockerImage.push();
+						dockerImage.push('latest');
+					}
+				}
+			}
+		}
+
 
 	} 
 	post{
